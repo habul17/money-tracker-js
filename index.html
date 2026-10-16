@@ -1,0 +1,245 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="description" content="How much more money do I need to be free?">
+  <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0a0a0a" media="(prefers-color-scheme: dark)">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Money">
+  <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icon.svg">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="stylesheet" href="css/style.css">
+  <title>Money Tracker</title>
+</head>
+<body>
+  <div class="app">
+    <main>
+      <!-- HOME -->
+      <section id="screen-home" class="screen">
+        <!-- Shown only the first time, when there is no data yet -->
+        <form id="welcome-form" class="stack welcome" novalidate hidden>
+          <h1>Let's start with what you have.</h1>
+          <p class="muted">
+            Every number in this app is worked out from your entries, so this first one matters.
+            How much money do you have right now?
+          </p>
+          <span class="money-input">
+            <span aria-hidden="true">₹</span>
+            <input name="amount" inputmode="decimal" autocomplete="off" placeholder="0" aria-label="Money you have now">
+          </span>
+          <p class="form-error" role="alert"></p>
+          <button class="btn btn-primary btn-wide" type="submit">Continue</button>
+          <p class="muted small">Next you'll add your debts and put them in the order you want to clear them.</p>
+        </form>
+
+        <div id="home-content" class="stack"></div>
+      </section>
+
+      <!-- DEBTS -->
+      <section id="screen-debts" class="screen stack" hidden>
+        <div class="screen-head">
+          <div>
+            <h1>Your debts</h1>
+            <p class="muted">Top of the list is what you pay next.</p>
+          </div>
+          <button class="btn btn-outline btn-icon" type="button" data-action="add-debt" aria-label="Add a debt">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+          </button>
+        </div>
+        <div id="debt-lists" class="stack"></div>
+      </section>
+
+      <!-- LOG -->
+      <section id="screen-log" class="screen stack" hidden>
+        <div>
+          <h1>Log</h1>
+          <p class="muted">Every number in this app is worked out from these entries. Tap one to fix it.</p>
+        </div>
+        <div class="segmented" id="log-filter" role="radiogroup" aria-label="Show">
+          <label><input type="radio" name="filter" value="all" checked><span>All</span></label>
+          <label><input type="radio" name="filter" value="in"><span>In</span></label>
+          <label><input type="radio" name="filter" value="out"><span>Out</span></label>
+          <label><input type="radio" name="filter" value="paid"><span>Paid</span></label>
+        </div>
+        <div id="log-list" class="stack"></div>
+      </section>
+
+      <!-- SETTINGS -->
+      <section id="screen-settings" class="screen stack" hidden>
+        <h1>Settings</h1>
+
+        <div class="card card-warning">
+          <p><b>Your data lives only on this device.</b></p>
+          <p class="muted small">
+            Clearing your browser data, reinstalling the browser or changing your phone will erase
+            everything. Export often and keep the file somewhere else.
+          </p>
+        </div>
+
+        <div class="card stack-sm">
+          <h2>Backup</h2>
+          <p class="muted small" id="backup-count"></p>
+          <button class="btn btn-outline btn-wide btn-left" type="button" data-action="export">Export to a file</button>
+          <button class="btn btn-outline btn-wide btn-left" type="button" data-action="import">Restore from a file</button>
+          <input id="import-file" type="file" accept="application/json,.json" hidden>
+          <p class="muted small">Restoring replaces everything currently in the app.</p>
+        </div>
+
+        <div class="card stack-sm">
+          <h2>How the numbers work</h2>
+          <p class="muted small"><b>Income</b> raises your cash, so what you still need goes down.</p>
+          <p class="muted small">
+            <b>Expenses</b> lower your cash, so what you still need goes up. Buying groceries does not
+            increase what you owe anyone, it widens the gap.
+          </p>
+          <p class="muted small">
+            <b>Payments</b> lower your cash and the debt together, so what you still need does not move.
+            You turned money into progress.
+          </p>
+        </div>
+
+        <div class="card card-danger stack-sm">
+          <h2>Start over</h2>
+          <p class="muted small">Deletes every debt and entry on this device. There is no undo.</p>
+          <button class="btn btn-danger btn-wide" type="button" data-action="erase">Erase everything</button>
+        </div>
+      </section>
+    </main>
+
+    <!-- Always at the bottom: the Add button and the 4 tabs -->
+    <footer class="bottom-bar">
+      <button class="btn btn-primary btn-wide btn-add" type="button" data-action="add-entry">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+        Add
+      </button>
+      <nav class="nav">
+        <button type="button" data-action="go" data-screen="home" aria-current="page">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8"/><path d="M3 10a2 2 0 0 1 .709-1.528l7-6a2 2 0 0 1 2.582 0l7 6A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+          Home
+        </button>
+        <button type="button" data-action="go" data-screen="debts">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 12h11"/><path d="M10 18h11"/><path d="M10 6h11"/><path d="M4 10h2"/><path d="M4 6h1v4"/><path d="M6 18H4c0-1 2-2 2-3s-1-1.5-2-1"/></svg>
+          Debts
+        </button>
+        <button type="button" data-action="go" data-screen="log">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1Z"/><path d="M8 8h8"/><path d="M8 12h8"/><path d="M8 16h5"/></svg>
+          Log
+        </button>
+        <button type="button" data-action="go" data-screen="settings">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
+          Settings
+        </button>
+      </nav>
+    </footer>
+  </div>
+
+  <!-- Add or edit an entry (income, expense, payment) -->
+  <dialog id="entry-dialog" aria-labelledby="entry-title">
+    <form id="entry-form" class="stack" novalidate>
+      <div>
+        <h2 id="entry-title">Record something</h2>
+        <p id="entry-help" class="muted small"></p>
+      </div>
+
+      <div class="segmented" id="entry-kinds" role="radiogroup" aria-label="Type">
+        <label><input type="radio" name="kind" value="expense" checked><span>Expense</span></label>
+        <label><input type="radio" name="kind" value="income"><span>Income</span></label>
+        <label><input type="radio" name="kind" value="payment"><span>Payment</span></label>
+      </div>
+
+      <label class="field">
+        <span>Amount</span>
+        <span class="money-input">
+          <span aria-hidden="true">₹</span>
+          <input name="amount" inputmode="decimal" autocomplete="off" placeholder="0">
+        </span>
+      </label>
+
+      <div class="field" id="debt-field">
+        <label for="entry-debt">Towards</label>
+        <select id="entry-debt" name="debtId"></select>
+        <p id="no-debts" class="muted small empty">Nothing left to pay. Add a debt first.</p>
+        <p id="overpay-warning" class="amber small"></p>
+      </div>
+
+      <label class="field">
+        <span>Date</span>
+        <input type="date" name="date">
+      </label>
+
+      <label class="field">
+        <span>Note (optional)</span>
+        <input name="note" autocomplete="off" maxlength="80" placeholder="Groceries, rent, from dad…">
+      </label>
+
+      <p class="form-error" role="alert"></p>
+
+      <div class="dialog-actions">
+        <button type="button" class="btn btn-ghost red" id="entry-delete">Delete</button>
+        <span class="spacer"></span>
+        <button type="button" class="btn btn-ghost" data-action="close">Cancel</button>
+        <button type="submit" class="btn btn-primary" id="entry-submit">Record</button>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- Add or edit a debt -->
+  <dialog id="debt-dialog" aria-labelledby="debt-title">
+    <form id="debt-form" class="stack" novalidate>
+      <div>
+        <h2 id="debt-title">Add a debt</h2>
+        <p id="debt-help" class="muted small"></p>
+      </div>
+
+      <label class="field">
+        <span>Name</span>
+        <input name="debtName" autocomplete="off" maxlength="60" placeholder="Bank loan, credit card, cousin…">
+      </label>
+
+      <label class="field">
+        <span>Originally owed</span>
+        <span class="money-input">
+          <span aria-hidden="true">₹</span>
+          <input name="original" inputmode="decimal" autocomplete="off" placeholder="0">
+        </span>
+        <small class="muted">The progress bar measures against this. It never changes by itself.</small>
+      </label>
+
+      <label class="field" id="remaining-field">
+        <span>Still owed today</span>
+        <span class="money-input">
+          <span aria-hidden="true">₹</span>
+          <input name="remaining" inputmode="decimal" autocomplete="off" placeholder="0">
+        </span>
+        <small class="muted">
+          This goes down by itself when you record payments. Change it only when a fee was added or
+          something is wrong.
+        </small>
+      </label>
+
+      <p class="form-error" role="alert"></p>
+
+      <div class="dialog-actions">
+        <button type="button" class="btn btn-ghost" id="debt-archive">Archive</button>
+        <button type="button" class="btn btn-ghost" id="debt-restore">Restore</button>
+        <button type="button" class="btn btn-ghost red" id="debt-delete">Delete</button>
+        <span class="spacer"></span>
+        <button type="button" class="btn btn-ghost" data-action="close">Cancel</button>
+        <button type="submit" class="btn btn-primary" id="debt-submit">Add debt</button>
+      </div>
+    </form>
+  </dialog>
+
+  <div id="toast" role="status" aria-live="polite"></div>
+
+  <!-- Order matters: each file uses functions from the files above it -->
+  <script src="js/money.js"></script>
+  <script src="js/ledger.js"></script>
+  <script src="js/storage.js"></script>
+  <script src="js/render.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

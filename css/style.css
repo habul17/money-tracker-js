@@ -1,0 +1,550 @@
+/* ---- Colours ----
+   All colours are variables, so dark mode only has to change these. */
+:root {
+  color-scheme: light dark; /* native inputs (date, select) follow the theme too */
+  --bg: #ffffff;
+  --card: #ffffff;
+  --soft: #f4f4f5;
+  --text: #18181b;
+  --muted: #71717a;
+  --border: #e4e4e7;
+  --primary: #18181b;
+  --on-primary: #fafafa;
+  --green: #059669;
+  --red: #e11d48;
+  --amber: #b45309;
+  --radius: 12px;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #09090b;
+    --card: #18181b;
+    --soft: #27272a;
+    --text: #fafafa;
+    --muted: #a1a1aa;
+    --border: #2e2e33;
+    --primary: #e4e4e7;
+    --on-primary: #18181b;
+    --green: #34d399;
+    --red: #fb7185;
+    --amber: #fbbf24;
+  }
+}
+
+/* ---- Base ---- */
+* {
+  box-sizing: border-box;
+}
+
+/* Make the hidden attribute win over display: flex / grid below. */
+[hidden] {
+  display: none !important;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font: 16px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  -webkit-tap-highlight-color: transparent;
+}
+
+h1, h2, p {
+  margin: 0;
+}
+
+h1 {
+  font-size: 1.5rem;
+  line-height: 1.25;
+  letter-spacing: -0.02em;
+}
+
+h2 {
+  font-size: 1.05rem;
+}
+
+button, input, select {
+  font: inherit;
+  color: inherit;
+}
+
+svg {
+  width: 20px;
+  height: 20px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  flex-shrink: 0;
+}
+
+hr {
+  border: 0;
+  border-top: 1px solid var(--border);
+  margin: 12px 0;
+}
+
+/* ---- Layout ---- */
+.app {
+  max-width: 28rem; /* phone width, centred on a big screen */
+  margin: 0 auto;
+  min-height: 100dvh;
+}
+
+main {
+  padding: 24px 16px 200px; /* bottom space so the fixed bar never covers content */
+}
+
+.stack > * + * { margin-top: 20px; }
+.stack-sm > * + * { margin-top: 10px; }
+.stack-xs > * + * { margin-top: 6px; }
+
+.row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.grow {
+  flex: 1;
+  min-width: 0;
+}
+
+.screen-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+/* ---- Text ---- */
+.muted { color: var(--muted); }
+.small { font-size: 0.85rem; }
+.green { color: var(--green); }
+.red { color: var(--red); }
+.amber { color: var(--amber); }
+
+.label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.headline {
+  text-align: center;
+  padding-top: 8px;
+}
+
+.big-number {
+  font-size: 3rem;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1.15;
+  font-variant-numeric: tabular-nums;
+}
+
+b, .entry-amount, .debt-name {
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---- Cards ---- */
+.card {
+  display: block;
+  width: 100%;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px;
+}
+
+.card-button {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.card-button:hover { background: var(--soft); }
+.card-empty { border-style: dashed; text-align: center; }
+.card-warning { border-color: color-mix(in srgb, var(--amber) 35%, transparent); background: color-mix(in srgb, var(--amber) 7%, var(--card)); }
+.card-success { border-color: color-mix(in srgb, var(--green) 35%, transparent); background: color-mix(in srgb, var(--green) 7%, var(--card)); }
+.card-danger { border-color: color-mix(in srgb, var(--red) 35%, transparent); }
+
+/* ---- Progress bar ---- */
+.progress {
+  height: 8px;
+  border-radius: 999px;
+  background: var(--soft);
+  overflow: hidden;
+}
+
+.progress > div {
+  height: 100%;
+  border-radius: inherit;
+  background: var(--primary);
+}
+
+/* ---- Buttons ---- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 40px;
+  padding: 0 16px;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  background: none;
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+}
+
+.btn:disabled { opacity: 0.3; cursor: default; }
+.btn-primary { background: var(--primary); color: var(--on-primary); }
+.btn-primary:hover { opacity: 0.9; }
+.btn-outline { border-color: var(--border); background: var(--card); }
+.btn-outline:hover, .btn-ghost:not(:disabled):hover { background: var(--soft); }
+.btn-danger { background: var(--red); color: #fff; }
+.btn-wide { width: 100%; }
+.btn-left { justify-content: flex-start; }
+.btn-small { min-height: 30px; padding: 0 10px; font-size: 0.8rem; }
+.btn-icon { width: 40px; padding: 0; }
+.btn-icon-sm { width: 36px; min-height: 30px; padding: 0; }
+.btn-add { min-height: 48px; border-radius: var(--radius); }
+
+:focus-visible {
+  outline: 2px solid var(--muted);
+  outline-offset: 2px;
+}
+
+/* ---- Forms ---- */
+.field {
+  display: grid;
+  gap: 6px;
+}
+
+.field > span:first-child, .field > label {
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+input:not([type=radio]), select {
+  width: 100%;
+  min-height: 44px;
+  padding: 0 12px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--bg);
+}
+
+/* Big rupee input with a ₹ sign inside it */
+.money-input {
+  position: relative;
+  display: block;
+}
+
+.money-input > span {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--muted);
+  font-size: 1.2rem;
+}
+
+.money-input input {
+  min-height: 56px;
+  padding-left: 32px;
+  font-size: 1.5rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.form-error {
+  color: var(--red);
+  font-size: 0.85rem;
+}
+
+.form-error:empty { display: none; }
+
+.empty {
+  padding: 14px 12px;
+  border: 1px dashed var(--border);
+  border-radius: 10px;
+}
+
+/* Segmented control: radio buttons that look like tabs */
+.segmented {
+  display: grid;
+  grid-auto-columns: 1fr;
+  grid-auto-flow: column;
+  padding: 3px;
+  border-radius: 10px;
+  background: var(--soft);
+}
+
+.segmented input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.segmented span {
+  display: block;
+  padding: 6px 4px;
+  border-radius: 8px;
+  text-align: center;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--muted);
+  cursor: pointer;
+}
+
+.segmented input:checked + span {
+  background: var(--card);
+  color: var(--text);
+  box-shadow: 0 1px 3px rgb(0 0 0 / 0.12);
+}
+
+.segmented input:focus-visible + span {
+  outline: 2px solid var(--muted);
+}
+
+/* ---- Entry rows (Recent and Log) ---- */
+.entries > * + * {
+  border-top: 1px solid var(--border);
+}
+
+.entry {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 12px 8px;
+  margin: 0 -8px;
+  width: calc(100% + 16px);
+  border: 0;
+  border-radius: 10px;
+  background: none;
+  text-align: left;
+  cursor: pointer;
+}
+
+.entry:hover { background: var(--soft); }
+
+.entry-icon {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--soft);
+  flex-shrink: 0;
+}
+
+.entry-icon svg { width: 16px; height: 16px; }
+
+.entry-text {
+  flex: 1;
+  min-width: 0;
+}
+
+.entry-title, .entry-sub {
+  display: block;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.entry-title { font-size: 0.9rem; font-weight: 500; }
+.entry-sub { font-size: 0.75rem; color: var(--muted); }
+.entry-amount { font-size: 0.9rem; font-weight: 600; flex-shrink: 0; }
+
+/* ---- Debts ---- */
+.debt-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 8px;
+}
+
+.debt-card {
+  display: flex;
+  align-items: center;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+.debt-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--card);
+  text-align: left;
+  cursor: pointer;
+}
+
+.debt-card .debt-row {
+  border: 0;
+  background: none;
+  min-width: 0;
+}
+
+.debt-row:hover { background: var(--soft); }
+.debt-row.archived { border-style: dashed; opacity: 0.6; }
+
+.debt-name {
+  display: block;
+  font-weight: 600;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.debt-name.big { font-size: 1.15rem; }
+.debt-name.done { text-decoration: line-through; opacity: 0.7; font-weight: 500; }
+
+.position {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--soft);
+  font-size: 0.8rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.move {
+  display: grid;
+  padding-right: 6px;
+}
+
+.badge-check {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  color: var(--green);
+  background: color-mix(in srgb, var(--green) 15%, transparent);
+  flex-shrink: 0;
+}
+
+.badge-check svg { width: 16px; height: 16px; }
+
+.tag {
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--soft);
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+
+/* ---- Bottom bar ---- */
+.bottom-bar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  max-width: 28rem;
+  margin: 0 auto;
+  padding: 12px 16px max(10px, env(safe-area-inset-bottom));
+  background: var(--bg);
+  border-top: 1px solid var(--border);
+}
+
+.nav {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  margin-top: 10px;
+}
+
+.nav button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 4px 0;
+  border: 0;
+  border-radius: 8px;
+  background: none;
+  font-size: 0.7rem;
+  font-weight: 500;
+  color: var(--muted);
+  cursor: pointer;
+}
+
+.nav button[aria-current="page"] { color: var(--text); }
+
+/* ---- Dialogs ---- */
+dialog {
+  width: min(28rem, calc(100% - 24px));
+  max-height: calc(100dvh - 24px);
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: var(--card);
+  color: var(--text);
+  overflow: auto;
+}
+
+dialog::backdrop {
+  background: rgb(0 0 0 / 0.5);
+}
+
+dialog form {
+  padding: 20px;
+}
+
+.dialog-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+}
+
+.dialog-actions .spacer { flex: 1; }
+
+/* ---- Toast ---- */
+#toast {
+  position: fixed;
+  left: 50%;
+  top: 16px;
+  transform: translate(-50%, calc(-100% - 24px));
+  opacity: 0;
+  max-width: calc(100% - 32px);
+  padding: 10px 16px;
+  border-radius: 10px;
+  background: var(--primary);
+  color: var(--on-primary);
+  font-size: 0.9rem;
+  font-weight: 500;
+  box-shadow: 0 6px 20px rgb(0 0 0 / 0.2);
+  transition: transform 0.25s, opacity 0.25s;
+  pointer-events: none;
+  z-index: 10;
+}
+
+#toast.show {
+  transform: translate(-50%, 0);
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #toast { transition: none; }
+}
