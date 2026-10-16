@@ -1,0 +1,14 @@
+{
+  "name": "Money Tracker",
+  "short_name": "Money",
+  "description": "How much more money do I need to be free?",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#ffffff",
+  "theme_color": "#ffffff",
+  "icons": [
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+  ]
+}
