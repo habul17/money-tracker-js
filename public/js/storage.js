@@ -1,42 +1,93 @@
-// Saving and loading. Everything lives in localStorage on this device.
-// There is no server and no account.
+// Saving and loading. The data lives in MySQL on the server, under your account.
+// The browser keeps only the login token (in localStorage) and sends it with every request.
 
-const STORAGE_KEY = 'money-tracker:v1'
+const TOKEN_KEY = 'money-tracker:token'
+const EMAIL_KEY = 'money-tracker:email'
 
 function emptyState() {
   return { version: 1, debts: [], transactions: [] }
 }
 
-function loadState() {
-  let saved
-  try {
-    saved = localStorage.getItem(STORAGE_KEY)
-  } catch {
-    return emptyState() // storage is blocked (some private modes)
-  }
-  if (saved === null) return emptyState() // first visit
+// ---- Login token ----
 
+function getSaved(key) {
   try {
-    return parseBackup(saved)
+    return localStorage.getItem(key)
   } catch {
-    // The saved data is broken. Keep a copy before starting fresh,
-    // because our next save would overwrite it.
-    try {
-      localStorage.setItem(STORAGE_KEY + ':unreadable', saved)
-    } catch {
-      // nothing more we can do
-    }
-    return emptyState()
+    return null // storage is blocked (some private modes)
   }
 }
 
-function saveState(state) {
+function setSaved(key, value) {
   try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(state))
+    if (value === null) localStorage.removeItem(key)
+    else localStorage.setItem(key, value)
   } catch {
-    // Storage is full or blocked. The app still works until the page closes,
-    // and Export still works.
+    // storage is blocked: you stay logged in until the page closes
   }
+}
+
+let token = getSaved(TOKEN_KEY)
+
+function isLoggedIn() {
+  return token !== null
+}
+
+function loggedInEmail() {
+  return getSaved(EMAIL_KEY) || ''
+}
+
+// ---- Talking to the server ----
+
+// Sends a request with the token. Throws an Error (with .status) if it fails.
+async function api(path, method = 'GET', body) {
+  let response
+  try {
+    response = await fetch(path, {
+      method,
+      headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
+      body: body === undefined ? undefined : JSON.stringify(body),
+    })
+  } catch {
+    throw new Error("Can't reach the server. Check your connection.")
+  }
+
+  const data = await response.json().catch(() => ({}))
+  if (!response.ok) {
+    const error = new Error(data.message || 'Something went wrong.')
+    error.status = response.status // 401 means the login token is missing or old
+    throw error
+  }
+  return data
+}
+
+// mode is 'signup' or 'login'
+async function logIn(mode, email, password) {
+  const data = await api('/api/auth/' + mode, 'POST', { email, password })
+  token = data.token
+  setSaved(TOKEN_KEY, data.token)
+  setSaved(EMAIL_KEY, data.email)
+}
+
+function logOut() {
+  token = null
+  setSaved(TOKEN_KEY, null)
+  setSaved(EMAIL_KEY, null)
+}
+
+function loadState() {
+  return api('/api/data') // { version, debts, transactions }
+}
+
+// Saves run one after another, so an older save can never land after a newer one.
+// Each save sends everything, so one good save fixes any save that failed before it.
+let saveQueue = Promise.resolve()
+
+function saveState(state) {
+  const copy = JSON.parse(JSON.stringify(state)) // the state as it is right now
+  const save = saveQueue.then(() => api('/api/data', 'PUT', copy))
+  saveQueue = save.catch(() => {}) // a failed save must not block the next one
+  return save
 }
 
 // ---- Backup file (JSON export and import) ----

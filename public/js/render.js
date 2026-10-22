@@ -276,5 +276,6 @@ function renderLog() {
 // ---- Settings ----
 
 function renderSettings() {
+  $('#account-email').textContent = loggedInEmail()
   $('#backup-count').textContent = `${state.transactions.length} entries across ${state.debts.length} debts.`
 }

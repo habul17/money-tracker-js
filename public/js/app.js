@@ -2,18 +2,21 @@
 
 // ---- State ----
 // The only data we store. Cash, balances and totals are worked out from it
-// by ledger.js every time we draw.
-let state = loadState()
+// by ledger.js every time we draw. It is loaded from the server after you log in.
+let state = emptyState()
 
 let logFilter = 'all'
 let editingEntryId = null // null means we are adding a new entry
 let editingDebtId = null // null means we are adding a new debt
 
-// Every change ends here: save to localStorage, then redraw the screens.
+// Every change ends here: redraw the screens, then save to the server.
 function commit(message) {
-  saveState(state)
   render()
   if (message) showToast(message)
+  saveState(state).catch((error) => {
+    if (error.status === 401) showAuth(error.message) // the login token ran out
+    else showToast('Not saved: ' + error.message)
+  })
 }
 
 function newId() {
@@ -51,6 +54,69 @@ function showScreen(name) {
     else button.removeAttribute('aria-current')
   }
   window.scrollTo(0, 0)
+}
+
+// ---- Sign up and log in ----
+
+let authMode = 'login' // or 'signup'
+const authForm = $('#auth-form')
+
+function showAuth(message) {
+  state = emptyState()
+  $('#auth').hidden = false
+  $('#app').hidden = true
+  showFormError(authForm, message || '')
+}
+
+function setAuthMode(mode) {
+  authMode = mode
+  const signingUp = mode === 'signup'
+  $('#auth-title').textContent = signingUp ? 'Create your account' : 'Log in'
+  $('#auth-submit').textContent = signingUp ? 'Sign up' : 'Log in'
+  $('#auth-switch-text').textContent = signingUp ? 'Already have an account?' : 'New here?'
+  $('#auth-switch').textContent = signingUp ? 'Log in' : 'Create an account'
+  authForm.password.autocomplete = signingUp ? 'new-password' : 'current-password'
+  showFormError(authForm, '')
+}
+
+async function submitAuth(event) {
+  event.preventDefault()
+  const email = authForm.email.value.trim()
+  const password = authForm.password.value
+  if (!email || password.length < 8) return showFormError(authForm, 'Enter your email and a password of at least 8 characters.')
+
+  $('#auth-submit').disabled = true
+  try {
+    await logIn(authMode, email, password)
+    authForm.reset()
+    await start()
+  } catch (error) {
+    showFormError(authForm, error.message)
+  } finally {
+    $('#auth-submit').disabled = false
+  }
+}
+
+function doLogOut() {
+  logOut()
+  setAuthMode('login')
+  showAuth()
+}
+
+// Load your data from the server and show the app. Nothing can be changed
+// before this works, so an empty screen can never overwrite your saved data.
+async function start() {
+  if (!isLoggedIn()) return showAuth()
+  try {
+    state = await loadState()
+  } catch (error) {
+    if (error.status === 401) logOut()
+    return showAuth(error.message)
+  }
+  $('#auth').hidden = true
+  $('#app').hidden = false
+  showScreen('home')
+  render()
 }
 
 // ---- First visit: how much money do you have? ----
@@ -353,10 +419,13 @@ document.addEventListener('click', (event) => {
     case 'export': downloadBackup(state); showToast('Backup saved. Keep it somewhere other than this phone.'); break
     case 'import': $('#import-file').click(); break
     case 'erase': eraseEverything(); break
+    case 'switch-auth': setAuthMode(authMode === 'login' ? 'signup' : 'login'); break
+    case 'logout': doLogOut(); break
     case 'close': button.closest('dialog').close(); break
   }
 })
 
+authForm.addEventListener('submit', submitAuth)
 $('#welcome-form').addEventListener('submit', saveOpeningBalance)
 
 entryForm.addEventListener('submit', saveEntry)
@@ -387,4 +456,4 @@ for (const dialog of document.querySelectorAll('dialog')) {
 }
 
 // ---- Start ----
-render()
+start()

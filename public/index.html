@@ -15,7 +15,32 @@
   <title>Money Tracker</title>
 </head>
 <body>
-  <div class="app">
+  <!-- Shown when you are not logged in -->
+  <section id="auth" class="auth" hidden>
+    <form id="auth-form" class="stack" novalidate>
+      <div>
+        <h1 id="auth-title">Log in</h1>
+        <p class="muted">Your debts and entries are saved to your account, so they are there on any device.</p>
+      </div>
+      <label class="field">
+        <span>Email</span>
+        <input name="email" type="email" autocomplete="email" maxlength="255">
+      </label>
+      <label class="field">
+        <span>Password</span>
+        <input name="password" type="password" autocomplete="current-password" maxlength="72">
+        <small class="muted">At least 8 characters.</small>
+      </label>
+      <p class="form-error" role="alert"></p>
+      <button class="btn btn-primary btn-wide" type="submit" id="auth-submit">Log in</button>
+      <p class="muted small">
+        <span id="auth-switch-text">New here?</span>
+        <button type="button" class="link-button" data-action="switch-auth" id="auth-switch">Create an account</button>
+      </p>
+    </form>
+  </section>
+
+  <div class="app" id="app" hidden>
     <main>
       <!-- HOME -->
       <section id="screen-home" class="screen">
@@ -71,12 +96,10 @@
       <section id="screen-settings" class="screen stack" hidden>
         <h1>Settings</h1>
 
-        <div class="card card-warning">
-          <p><b>Your data lives only on this device.</b></p>
-          <p class="muted small">
-            Clearing your browser data, reinstalling the browser or changing your phone will erase
-            everything. Export often and keep the file somewhere else.
-          </p>
+        <div class="card stack-sm">
+          <h2>Account</h2>
+          <p class="muted small">Logged in as <b id="account-email"></b>. Everything is saved to your account.</p>
+          <button class="btn btn-outline btn-wide btn-left" type="button" data-action="logout">Log out</button>
         </div>
 
         <div class="card stack-sm">
@@ -103,7 +126,7 @@
 
         <div class="card card-danger stack-sm">
           <h2>Start over</h2>
-          <p class="muted small">Deletes every debt and entry on this device. There is no undo.</p>
+          <p class="muted small">Deletes every debt and entry in your account. There is no undo.</p>
           <button class="btn btn-danger btn-wide" type="button" data-action="erase">Erase everything</button>
         </div>
       </section>

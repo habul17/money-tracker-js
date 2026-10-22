@@ -548,3 +548,21 @@ dialog form {
 @media (prefers-reduced-motion: reduce) {
   #toast { transition: none; }
 }
+
+/* ---- Log in / sign up ---- */
+.auth {
+  max-width: 28rem;
+  margin: 0 auto;
+  padding: 48px 16px;
+}
+
+.link-button {
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--text);
+  font: inherit;
+  font-weight: 600;
+  text-decoration: underline;
+  cursor: pointer;
+}
